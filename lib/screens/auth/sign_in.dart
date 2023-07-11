@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({super.key});
+  final Function toggleView;
+  const SignIn({super.key, required this.toggleView});
 
   @override
   State<SignIn> createState() => _SignInState();
@@ -11,8 +12,10 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
+  final _formKey = GlobalKey<FormState>();
   String email = '';
   String password = '';
+  String? error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +24,32 @@ class _SignInState extends State<SignIn> {
       appBar: AppBar(
         backgroundColor: Colors.brown.shade400,
         elevation: 0.0,
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              widget.toggleView();
+              if (kDebugMode) {
+                print("register clicked");
+              }
+            },
+            icon: Icon(
+              Icons.person_add_alt_1,
+              color: Colors.grey.shade100,
+            ),
+            label: Text(
+              "",
+              style: TextStyle(
+                color: Colors.grey.shade100,
+              ),
+            ),
+          )
+        ],
         title: const Text("Sign in to Brew Crew"),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
         child: Form(
+          key: _formKey,
           child: Column(
             children: [
               const SizedBox(
@@ -38,6 +62,8 @@ class _SignInState extends State<SignIn> {
                     print(value);
                   }
                 },
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter your email' : null,
               ),
               const SizedBox(
                 height: 20.0,
@@ -50,14 +76,24 @@ class _SignInState extends State<SignIn> {
                     print(value);
                   }
                 },
+                validator: (value) =>
+                    value!.length < 6 ? 'Enter a +6 chars password' : null,
               ),
               const SizedBox(
                 height: 20.0,
               ),
               ElevatedButton(
                 onPressed: () async {
-                  if (kDebugMode) {
-                    print("email: $email & password: $password");
+                  if (_formKey.currentState!.validate()) {
+                    if (kDebugMode) {
+                      print("email: $email & password: $password");
+                    }
+                    dynamic result = await _auth.signInWithMailAndPassword(
+                        email: email, password: password);
+                    if (result == null) {
+                      setState(() =>
+                          error = 'could not sign in with those credentials');
+                    }
                   }
                 },
                 style: ButtonStyle(
@@ -67,6 +103,13 @@ class _SignInState extends State<SignIn> {
                   "Sign in",
                   style: TextStyle(color: Colors.grey.shade100),
                 ),
+              ),
+              const SizedBox(
+                height: 12.0,
+              ),
+              Text(
+                error!,
+                style: const TextStyle(color: Colors.red, fontSize: 14.0),
               )
             ],
           ),

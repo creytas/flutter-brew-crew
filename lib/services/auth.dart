@@ -4,16 +4,9 @@ import 'package:flutter/foundation.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // User? _firebaseUser(User user) {
-  //   if (kDebugMode) {
-  //     print("_firebaseUser is $user");
-  //   }
-  //   return user;
-  // }
-
   Stream<User?> get user => _auth.authStateChanges();
 
+  ///an anonyme sign in function
   Future signInAnon() async {
     try {
       UserCredential result = await _auth.signInAnonymously();
@@ -32,6 +25,45 @@ class AuthService {
     }
   }
 
+  /// a sign in function with login and password
+  Future signInWithMailAndPassword(
+      {required String email, required String password}) async {
+    try {
+      UserCredential result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      User? user = result.user;
+      if (kDebugMode) {
+        print("the user $user signed in successfully");
+      }
+      return user;
+    } catch (error) {
+      if (kDebugMode) {
+        print('error occured: $error');
+      }
+      return null;
+    }
+  }
+
+  /// a register fuction with login and password
+  Future registerWithMailAndPassword(
+      {required String email, required String password}) async {
+    try {
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      User? user = result.user;
+      if (kDebugMode) {
+        print("the created user is $user");
+      }
+      return user;
+    } catch (error) {
+      if (kDebugMode) {
+        print("error has occured: $error");
+      }
+      return null;
+    }
+  }
+
+  /// a sign out function
   Future signOut() async {
     try {
       if (kDebugMode) {

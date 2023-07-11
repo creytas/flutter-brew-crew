@@ -27,7 +27,7 @@ class Home extends StatelessWidget {
                 color: Colors.grey.shade100,
               ),
               label: Text(
-                "Logout",
+                "",
                 style: TextStyle(color: Colors.grey.shade100),
               ))
         ],
