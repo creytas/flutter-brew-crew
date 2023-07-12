@@ -1,4 +1,4 @@
-import 'package:brew_app/models/user.dart';
+import 'package:brew_app/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,10 +13,8 @@ class AuthService {
       User? user = result.user;
       if (kDebugMode) {
         print("the user sent is $user");
-        //print(_firebaseUser(user!));
       }
       return user;
-      //return _firebaseUser(user!);
     } catch (error) {
       if (kDebugMode) {
         print("error occured $error");
@@ -51,6 +49,8 @@ class AuthService {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
+      await DatabaseService(uid: user!.uid)
+          .updateUserData(sugars: '0', name: 'new crew member', strength: 100);
       if (kDebugMode) {
         print("the created user is $user");
       }

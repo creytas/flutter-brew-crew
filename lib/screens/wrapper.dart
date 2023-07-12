@@ -15,9 +15,6 @@ class Wrapper extends StatelessWidget {
       print(user);
     }
     if (user == null) {
-      if (kDebugMode) {
-        print("the user token is $user");
-      }
       return const Authenticate();
     } else {
       return Home();
